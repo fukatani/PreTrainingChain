@@ -14,6 +14,7 @@ import chainer.functions as F
 from chainer import ChainList, optimizers
 import numpy as np
 import six
+import l_pt_linear as P
 
 
 class AbstractChain(ChainList):
@@ -60,7 +61,8 @@ class AbstractChain(ChainList):
         self.child_models = []
         for i, n_unit in enumerate(self.n_units):
             if i == 0: continue
-            self.child_models.append(ChildChainList(F.Linear(self.n_units[i-1], n_unit)))
+            self.child_models.append(ChildChainList(P.PTLinear(self.n_units[i-1], n_unit)))
+            #self.child_models.append(ChildChainList(F.Linear(self.n_units[i-1], n_unit)))
 
     def forward(self, x_data, train=True):
         data = x_data
@@ -86,7 +88,6 @@ class AbstractChain(ChainList):
             for child in self.child_models:
                 self.add_link(child[0].copy())
         self.add_last_layer()
-        self.pre_trained = True
 
     def add_last_layer(self):
         raise NotImplementedError("""`add_last_layer` method is not implemented.
@@ -157,18 +158,11 @@ class ChildChainList(ChainList):
     def forward(self, x_data, train):
         return F.dropout(F.relu(self[0](x_data)), train=train)
 
-    def forward_as_autoencoder(self, x_data, train):
-        h = self.forward(x_data, train)
-        return F.dropout(self[1](h), train=train)
-
-    def add_dummy_output_link(self, train_data_size):
-        self.add_link(F.Linear(self[0].W.data.shape[0] , train_data_size))
-
     def learn_as_autoencoder(self, x_train, x_test=None):
         optimizer = self.optimizer
         train_size = x_train.shape[0]
         train_data_size = x_train.shape[1]
-        self.add_dummy_output_link(train_data_size)
+        #self.add_dummy_output_link(train_data_size)
         for epoch in six.moves.range(self.epoch):
             perm = np.random.permutation(train_size)
             train_loss = 0
@@ -177,7 +171,7 @@ class ChildChainList(ChainList):
             for i in range(0, train_size, self.batch_size):
                 x = Variable(x_train[perm[i:i+self.batch_size]])
                 self.zerograds()
-                loss = self.loss_function(self.forward_as_autoencoder(x, train=True), x)
+                loss = self.loss_function(self[0](x), x)
                 loss.backward()
                 self.optimizer.update()
                 train_loss += loss.data * self.batch_size
@@ -185,7 +179,7 @@ class ChildChainList(ChainList):
 
             if len(x_test):
                 x = Variable(x_test)
-                test_loss = self.loss_function(self.forward_as_autoencoder(x, train=False), x).data
+                test_loss = self.loss_function(self[0](x), x).data
         if test_loss is not None:
             print('Pre-training test loss: ' + str(test_loss))
         if self.visualize:
@@ -194,3 +188,4 @@ class ChildChainList(ChainList):
             with open('child_graph.dot', 'w') as o:
                 o.write(g.dump())
         del self.optimizer
+        self[0].is_pre_training = False
