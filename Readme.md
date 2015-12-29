@@ -31,6 +31,12 @@ Installation
 ==============================
 
 ```
+$ pip install PreTrainingChain
+```
+
+or
+
+```
 $ git clone https://github.com/fukatani/PreTrainingChain.git
 ```
 

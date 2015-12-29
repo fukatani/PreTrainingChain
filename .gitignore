@@ -1,3 +1,6 @@
 *.bat
 *.pyc
 *.dot
+PreTrainingChain.egg-info/
+build/
+dist/
