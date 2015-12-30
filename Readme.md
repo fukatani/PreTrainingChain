@@ -3,7 +3,7 @@ Introduction
 ==============================
 
 Extension of chainer.ChainList for the purpose of network scalability for deep leaning.
-(You need chainer http://chainer.org/)
+(You need deep learning framework "chainer" http://chainer.org/)
 
 feature:
 1) You can define network structure by list or tuple such as [784, 250, 200, 160, 10].
@@ -43,6 +43,11 @@ $ git clone https://github.com/fukatani/PreTrainingChain.git
 
 Example
 ==============================
+
+Implement example is here
+https://github.com/fukatani/PreTrainingChain/blob/master/PreTrainingChain/Example.py
+You have to override add_last_layer method and loss_function method.
+
 Example.py is implement for  mnist classification.
 
 ```
