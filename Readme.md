@@ -3,12 +3,13 @@ Introduction
 ==============================
 
 Extension of chainer.ChainList for the purpose of network scalability for deep leaning.
+(You need chainer http://chainer.org/)
 
 feature:
 1) You can define network structure by list or tuple such as [784, 250, 200, 160, 10].
    This feature accelerate your deep network development.
    If you call this class by AbstractChain([784, 250, 200, 160, 10]),
-   ChainList->
+   you can generate ChainList->
    (F.Linear(784, 250),
    F.Linear(250, 200),
    F.Linear(200, 160),
@@ -25,7 +26,7 @@ feature:
 Software Requirements
 ==============================
 * Python (2.7)
-
+* chainer >= 1.5.0
 
 Installation
 ==============================
