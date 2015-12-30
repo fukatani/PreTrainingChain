@@ -14,7 +14,7 @@ import chainer.functions as F
 from chainer import ChainList, optimizers
 import numpy as np
 import six
-import l_pt_linear as P
+import pt_linear as P
 
 
 class AbstractChain(ChainList):
@@ -75,11 +75,14 @@ class AbstractChain(ChainList):
         [FUNCTIONS]
         Do Pre-training for each layers by using Auto-Encoder method.
         """
+        P.PT_manager(F.relu)
         now_sample = sample
         now_test = test
         if sample.size:
             for child in self.child_models:
+                P.PT_manager().is_pre_training = True
                 child.learn_as_autoencoder(now_sample, now_test)
+                P.PT_manager().is_pre_training = False
                 self.add_link(child[0].copy())
                 now_sample = self.forward(Variable(sample), False).data
                 if len(test):
@@ -87,7 +90,9 @@ class AbstractChain(ChainList):
         else:
             for child in self.child_models:
                 self.add_link(child[0].copy())
+                #self.add_link(child[0])
         self.add_last_layer()
+        self.pre_trained = True
 
     def add_last_layer(self):
         raise NotImplementedError("""`add_last_layer` method is not implemented.
@@ -132,10 +137,14 @@ class AbstractChain(ChainList):
                     print('test_accuracy: ' + str(test_accuracy))
 
         if self.visualize:
-            import chainer.computational_graph as c
-            g = c.build_computational_graph((loss,))
-            with open('graph.dot', 'w') as o:
-                o.write(g.dump())
+            self.visualize_net(loss)
+
+    def visualize_net(self, loss):
+        import chainer.computational_graph as c
+        g = c.build_computational_graph((loss,))
+        with open('graph.dot', 'w') as o:
+            o.write(g.dump())
+
 
 class ChildChainList(ChainList):
     """
@@ -188,4 +197,3 @@ class ChildChainList(ChainList):
             with open('child_graph.dot', 'w') as o:
                 o.write(g.dump())
         del self.optimizer
-        self[0].is_pre_training = False

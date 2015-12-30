@@ -11,6 +11,7 @@
 
 import numpy as np
 import PreTrainingChain.AbstractChain
+import chainer.functions as F
 
 class PreTrainingDNN(PreTrainingChain.AbstractChain.AbstractChain):
     """
@@ -40,10 +41,10 @@ def make_sample(size):
     return sample
 
 if __name__ == '__main__':
-    pre_train_size = 1000
+    pre_train_size = 5000
     pre_test_size = 200
-    train_size = 1000
-    test_size = 200
+    train_size = 2000
+    test_size = 2000
 
     sample = make_sample(pre_train_size+pre_test_size+train_size+test_size)
     x_pre_train, x_pre_test, x_train, x_test, _ = np.split(sample.data,
@@ -58,7 +59,7 @@ if __name__ == '__main__':
         pre_train_size + pre_test_size + train_size,
         pre_train_size + pre_test_size + train_size + test_size])
 
-    pc = PreTrainingDNN([784,200,200,200,200,10])
+    pc = PreTrainingDNN([784,400,300,150,100,10])
     pc.pre_training(x_pre_train, x_pre_test)
     pc.learn(x_train, y_train, x_test, y_test, True)
 
