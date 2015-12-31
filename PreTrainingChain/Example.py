@@ -59,7 +59,19 @@ if __name__ == '__main__':
         pre_train_size + pre_test_size + train_size,
         pre_train_size + pre_test_size + train_size + test_size])
 
+    #input layer=784, hidden_layer 1st = 400, hidden_layer 2nd = 300,
+    #hidden_layer 3rd = 150, hidden_layer 4th = 100, output layer = 10
     pc = PreTrainingDNN([784,400,300,150,100,10])
+
+    #x_pre_train: sample data for pre-training
+    #if x_pre_train == numpy.array([]), pre-training is skkiped.
+    #x_pre_test: sample data for calculate loss after pre-training (optional)
     pc.pre_training(x_pre_train, x_pre_test)
-    pc.learn(x_train, y_train, x_test, y_test, True)
+
+    #x_train: sample data for learn as deep network
+    #y_train: sample target for learn as deep network (e.g. 0-9 for MNIST)
+    #x_train: sample data for test as deep network
+    #y_train: sample target for test as deep network (e.g. 0-9 for MNIST)
+    #isClassification: Classification problem or not
+    pc.learn(x_train, y_train, x_test, y_test, isClassification=True)
 

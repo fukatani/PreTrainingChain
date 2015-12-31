@@ -1,12 +1,13 @@
 
-Introduction
-==============================
+##Introduction
 
-Extension of chainer.ChainList for the purpose of network scalability for deep leaning.
-(You need deep learning framework "chainer" http://chainer.org/)
 
-feature:
-1) You can define network structure by list or tuple such as [784, 250, 200, 160, 10].
+Extension of chainer.
+ChainList for the purpose of network scalability/congirablity/Pre-training executablity for deep leaning.
+(You need to get deep learning framework "chainer" from http://chainer.org/)
+
+## feature:
+####1) You can define network structure by list or tuple such as [784, 250, 200, 160, 10].
    This feature accelerate your deep network development.
    If you call this class by AbstractChain([784, 250, 200, 160, 10]),
    you can generate ChainList->
@@ -16,20 +17,20 @@ feature:
    F.Linear(160, 10))
    You can change network structure without any hard coding.
 
-2) Pre-training is implemented.
-   You can execute pre-training only by calling AbstractChain.pre_training(train_data, test_data).
-   test_data is optional.
-   If you input any test_data, result of test as autoencoder at each hidden layer will be printed.
+####2) Pre-training executable.
+   You can execute pre-training only by calling AbstractChain.pre_training(train_data).
+   Pretraining is executed by using Bengio method.
+   (http://arxiv.org/pdf/1206.5538.pdf)
    If length of train_Data is zero, Pre-training is skipped.
 
 
-Software Requirements
-==============================
+##Software Requirements
+
 * Python (2.7)
 * chainer >= 1.5.0
 
-Installation
-==============================
+##Installation
+
 
 ```
 $ pip install PreTrainingChain
@@ -41,8 +42,7 @@ or
 $ git clone https://github.com/fukatani/PreTrainingChain.git
 ```
 
-Example
-==============================
+##Example
 
 Implement example is here
 https://github.com/fukatani/PreTrainingChain/blob/master/PreTrainingChain/Example.py
@@ -82,21 +82,20 @@ test_accuracy: 0.289999991655
 ```
 
 
-License
-==============================
+##License
 
 Apache License 2.0
 (http://www.apache.org/licenses/LICENSE-2.0)
 
 
-Copyright
-==============================
+##Copyright
 
 Copyright (C) 2015, Ryosuke Fukatani
 
-Related Project and Site
-==============================
+##Related Project and Site
 
 chainer
 http://docs.chainer.org/en/stable/index.html
 
+Blog entry(Japanese)
+http://segafreder.hatenablog.com/entry/2015/12/30/183319
