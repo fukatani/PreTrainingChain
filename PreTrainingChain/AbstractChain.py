@@ -9,9 +9,8 @@
 # Licence:     Apache Licence 2.0
 #-------------------------------------------------------------------------------
 
-from chainer import cuda, Variable, FunctionSet, optimizers
+from chainer import cuda, Variable, ChainList, optimizers
 import chainer.functions as F
-from chainer import ChainList, optimizers
 import numpy as np
 import six
 import pt_linear as P
@@ -171,7 +170,7 @@ class ChildChainList(ChainList):
         optimizer = self.optimizer
         train_size = x_train.shape[0]
         train_data_size = x_train.shape[1]
-        #self.add_dummy_output_link(train_data_size)
+
         for epoch in six.moves.range(self.epoch):
             perm = np.random.permutation(train_size)
             train_loss = 0
