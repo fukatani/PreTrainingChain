@@ -10,22 +10,7 @@
 #-------------------------------------------------------------------------------
 
 import numpy as np
-import PreTrainingChain.AbstractChain
-import chainer.functions as F
-
-class PreTrainingDNN(PreTrainingChain.AbstractChain.AbstractChain):
-    """
-    [Classes]
-    Sample of DNN for classification.
-    If you use this class for minst.
-    n_units = [784, n, m, ..., 10]
-    784 is dimension of sample.data and 10 is dimension of sample.target.
-    """
-    def add_last_layer(self):
-        self.add_link(F.Linear(self.n_units[-1], self.last_unit))
-
-    def loss_function(self, x, y):
-        return F.softmax_cross_entropy(x, y)
+from PreTrainingChain import ChainClassfier
 
 def make_sample(size):
     from sklearn.datasets import fetch_mldata
@@ -41,7 +26,7 @@ def make_sample(size):
     return sample
 
 if __name__ == '__main__':
-    pre_train_size = 5000
+    pre_train_size = 1
     pre_test_size = 200
     train_size = 2000
     test_size = 2000
@@ -61,11 +46,12 @@ if __name__ == '__main__':
 
     #input layer=784, hidden_layer 1st = 400, hidden_layer 2nd = 300,
     #hidden_layer 3rd = 150, hidden_layer 4th = 100, output layer = 10
-    pc = PreTrainingDNN([784,400,300,150,100,10])
+    pc = ChainClassfier([784,400,150,10])
 
     #x_pre_train: sample data for pre-training
     #if x_pre_train == numpy.array([]), pre-training is skkiped.
     #x_pre_test: sample data for calculate loss after pre-training (optional)
+    pc.construct()
     pc.pre_training(x_pre_train, x_pre_test)
 
     #x_train: sample data for learn as deep network
@@ -73,5 +59,6 @@ if __name__ == '__main__':
     #x_train: sample data for test as deep network
     #y_train: sample target for test as deep network (e.g. 0-9 for MNIST)
     #isClassification: Classification problem or not
-    pc.learn(x_train, y_train, x_test, y_test, isClassification=True)
+    pc.fit(x_train, y_train)
+    pc.predict(x_test, y_test)
 

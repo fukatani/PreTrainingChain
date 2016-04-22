@@ -10,13 +10,14 @@
 #-------------------------------------------------------------------------------
 
 from chainer import cuda, Variable, ChainList, optimizers
+from sklearn.base import BaseEstimator, ClassifierMixin
 import chainer.functions as F
 import numpy as np
 import six
 import pt_linear as P
 
 
-class AbstractChain(ChainList):
+class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
     """
     [Classes]
     Extension of chainer.ChainList.
@@ -40,17 +41,19 @@ class AbstractChain(ChainList):
     3) This class is super class of ChainList.
        So you can use function of ChainList.
     """
-    def __init__(self, n_units, epoch=10, batch_size=100, visualize=True):
-        ChainList.__init__(self)
+    def __init__(self, n_units, epoch=10, batch_size=100):
         self.n_units = n_units[0:-1]
         self.last_unit = n_units[-1]
-        self.total_layer = len(n_units)
-        self.collect_child_model()
-        self.set_optimizer()
         self.epoch = epoch
         self.batch_size = batch_size
-        self.visualize = visualize
         self.pre_trained = False
+
+    def construct(self):
+        self.total_layer = len(self.n_units)
+        ChainList.__init__(self)
+        self.collect_child_model()
+        self.collect_child_model()
+        self.set_optimizer()
 
     def set_optimizer(self):
         self.optimizer = optimizers.AdaDelta()
@@ -61,13 +64,18 @@ class AbstractChain(ChainList):
         for i, n_unit in enumerate(self.n_units):
             if i == 0: continue
             self.child_models.append(ChildChainList(P.PTLinear(self.n_units[i-1], n_unit)))
-            #self.child_models.append(ChildChainList(F.Linear(self.n_units[i-1], n_unit)))
 
     def forward(self, x_data, train=True):
         data = x_data
-        for model in self:
-            data = F.dropout(F.relu(model(data)), train=train)
-        return data
+        if self.isClassification:
+            for model in self:
+                data = F.dropout(F.relu(model(data)), train=train)
+            return data
+        else:
+            for model in range(len(self) - 1):
+                data = F.dropout(F.relu(model(data)), train=train)
+            data = F.dropout(model(data), train=train)
+            return data
 
     def pre_training(self, sample, test=[]):
         """
@@ -104,7 +112,7 @@ class AbstractChain(ChainList):
         example)
         return F.softmax_cross_entropy(x, y)""")
 
-    def learn(self, x_train, y_train, x_test, y_test, isClassification=False):
+    def fit(self, x_train, y_train):
         if not self.pre_trained:
             self.pre_training(np.array([]), np.array([]))
         train_size = x_train.shape[0]
@@ -125,18 +133,16 @@ class AbstractChain(ChainList):
                 train_loss += loss.data * self.batch_size
             train_loss /= train_size
 
-            if len(x_test):
-                x = Variable(x_test)
-                y = Variable(y_test)
-                predict = self.forward(x, train=False)
-                test_loss = self.loss_function(predict, y).data
-                print('test_loss: ' + str(test_loss))
-                if isClassification:
-                    test_accuracy = F.accuracy(predict, y).data
-                    print('test_accuracy: ' + str(test_accuracy))
-
-        if self.visualize:
-            self.visualize_net(loss)
+    def predict(self, x_test, y_test):
+        if len(x_test):
+            x = Variable(x_test)
+            y = Variable(y_test)
+            predict = self.forward(x, train=False)
+            test_loss = self.loss_function(predict, y).data
+            print('test_loss: ' + str(test_loss))
+            if self.isClassification:
+                test_accuracy = F.accuracy(predict, y).data
+                print('test_accuracy: ' + str(test_accuracy))
 
     def visualize_net(self, loss):
         import chainer.computational_graph as c
@@ -154,7 +160,7 @@ class ChildChainList(ChainList):
     so I don't expect to configurate forward, forward_as_autoencoder and learn_as_autoencoder.
     But you can configurate optimizer by editting __init__.
     """
-    def __init__(self, link, epoch=10, batch_size=100, visualize=True):
+    def __init__(self, link, epoch=10, batch_size=100, visualize=False):
         ChainList.__init__(self, link)
         self.optimizer = optimizers.AdaDelta()
         self.optimizer.setup(self)
