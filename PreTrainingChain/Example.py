@@ -60,5 +60,5 @@ if __name__ == '__main__':
     #y_train: sample target for test as deep network (e.g. 0-9 for MNIST)
     #isClassification: Classification problem or not
     pc.fit(x_train, y_train)
-    pc.predict(x_test, y_test)
+    pc.score(x_test, y_test)
 

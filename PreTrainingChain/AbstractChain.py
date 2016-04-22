@@ -52,8 +52,8 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         self.total_layer = len(self.n_units)
         ChainList.__init__(self)
         self.collect_child_model()
-        self.collect_child_model()
         self.set_optimizer()
+        self.pre_trained = False
 
     def set_optimizer(self):
         self.optimizer = optimizers.AdaDelta()
@@ -77,7 +77,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
             data = F.dropout(model(data), train=train)
             return data
 
-    def pre_training(self, sample, test=[]):
+    def pre_training(self, sample, test=()):
         """
         [FUNCTIONS]
         Do Pre-training for each layers by using Auto-Encoder method.
@@ -132,20 +132,23 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
                 self.optimizer.update()
                 train_loss += loss.data * self.batch_size
             train_loss /= train_size
+        self.fit__ = True
 
     def score(self, x_test, y_test):
         if len(x_test):
             x = Variable(x_test)
             y = Variable(y_test)
-            predict = self.forward(x, train=False)
+            predict = self.predict(x)
             test_loss = self.loss_function(predict, y).data
             print('test_loss: ' + str(test_loss))
             if self.isClassification:
                 test_accuracy = F.accuracy(predict, y).data
                 print('test_accuracy: ' + str(test_accuracy))
 
-    def predict(self, x_test):
-        self.forward(x_test, False)
+    def predict(self, x):
+        if not self.fit__:
+            raise Exception('Call predict before fit.')
+        return self.forward(x, False)
 
     def visualize_net(self, loss):
         import chainer.computational_graph as c
