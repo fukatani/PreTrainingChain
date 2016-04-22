@@ -133,7 +133,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
                 train_loss += loss.data * self.batch_size
             train_loss /= train_size
 
-    def predict(self, x_test, y_test):
+    def score(self, x_test, y_test):
         if len(x_test):
             x = Variable(x_test)
             y = Variable(y_test)
@@ -143,6 +143,9 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
             if self.isClassification:
                 test_accuracy = F.accuracy(predict, y).data
                 print('test_accuracy: ' + str(test_accuracy))
+
+    def predict(self, x_test):
+        self.forward(x_test, False)
 
     def visualize_net(self, loss):
         import chainer.computational_graph as c
