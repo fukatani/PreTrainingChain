@@ -50,15 +50,11 @@ if __name__ == '__main__':
 
     #x_pre_train: sample data for pre-training
     #if x_pre_train == numpy.array([]), pre-training is skkiped.
-    #x_pre_test: sample data for calculate loss after pre-training (optional)
-    pc.construct()
-    pc.pre_training(x_pre_train, x_pre_test)
-
     #x_train: sample data for learn as deep network
     #y_train: sample target for learn as deep network (e.g. 0-9 for MNIST)
     #x_train: sample data for test as deep network
     #y_train: sample target for test as deep network (e.g. 0-9 for MNIST)
     #isClassification: Classification problem or not
-    pc.fit(x_train, y_train)
-    pc.score(x_test, y_test)
+    pc.fit(x_train, y_train, x_pre_train=x_pre_train)
+    print('test_accuracy: {0}'.format(pc.score(x_test, y_test)))
 

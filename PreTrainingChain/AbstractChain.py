@@ -42,18 +42,19 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
        So you can use function of ChainList.
     """
     def __init__(self, n_units, epoch=10, batch_size=100):
-        self.n_units = n_units[0:-1]
-        self.last_unit = n_units[-1]
+        self.n_units = n_units
         self.epoch = epoch
         self.batch_size = batch_size
-        self.pre_trained = False
+        self.constructed = False
 
     def construct(self):
+        self.n_units = self.n_units[0:-1]
+        self.last_unit = self.n_units[-1]
+
         self.total_layer = len(self.n_units)
         ChainList.__init__(self)
         self.collect_child_model()
         self.set_optimizer()
-        self.pre_trained = False
 
     def set_optimizer(self):
         self.optimizer = optimizers.AdaDelta()
@@ -77,7 +78,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
             data = F.dropout(model(data), train=train)
             return data
 
-    def pre_training(self, sample, test=()):
+    def pre_training(self, sample, test=None):
         """
         [FUNCTIONS]
         Do Pre-training for each layers by using Auto-Encoder method.
@@ -92,10 +93,11 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
                 P.PT_manager().is_pre_training = False
                 self.add_link(child[0].copy())
                 now_sample = self.forward(Variable(sample), False).data
-                if len(test):
+                if test is not None:
                     now_test = self.forward(Variable(test), False).data
         else:
             for child in self.child_models:
+                P.PT_manager().is_pre_training = False
                 self.add_link(child[0].copy())
                 #self.add_link(child[0])
         self.add_last_layer()
@@ -112,8 +114,12 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         example)
         return F.softmax_cross_entropy(x, y)""")
 
-    def fit(self, x_train, y_train):
-        if not self.pre_trained:
+    def fit(self, x_train, y_train, x_pre_train=None, x_pre_test=None):
+        if not self.constructed:
+            self.construct()
+        if x_pre_train is not None:
+            self.pre_training(x_pre_train, x_pre_test)
+        else:
             self.pre_training(np.array([]), np.array([]))
         train_size = x_train.shape[0]
         train_data_size = x_train.shape[1]
@@ -143,7 +149,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
             print('test_loss: ' + str(test_loss))
             if self.isClassification:
                 test_accuracy = F.accuracy(predict, y).data
-                print('test_accuracy: ' + str(test_accuracy))
+                return float(test_accuracy)
 
     def predict(self, x):
         if not self.fit__:
@@ -197,7 +203,7 @@ class ChildChainList(ChainList):
                 train_loss += loss.data * self.batch_size
             train_loss /= train_size
 
-            if len(x_test):
+            if x_test is not None:
                 x = Variable(x_test)
                 test_loss = self.loss_function(self[0](x), x).data
         if test_loss is not None:
