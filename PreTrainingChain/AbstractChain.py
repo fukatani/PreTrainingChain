@@ -45,9 +45,13 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         self.n_units = n_units
         self.epoch = epoch
         self.batch_size = batch_size
-        self.constructed = False
+        self.__constructed = False
 
-    def construct(self):
+    def __construct(self):
+        """
+        Instead of __init.
+        For correspond to gridsearchCV.
+        """
         self.n_units = self.n_units[0:-1]
         self.last_unit = self.n_units[-1]
 
@@ -115,8 +119,8 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         return F.softmax_cross_entropy(x, y)""")
 
     def fit(self, x_train, y_train, x_pre_train=None, x_pre_test=None):
-        if not self.constructed:
-            self.construct()
+        if not self.__constructed:
+            self.__construct()
         if x_pre_train is not None:
             self.pre_training(x_pre_train, x_pre_test)
         else:
