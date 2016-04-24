@@ -150,6 +150,8 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
             if self.isClassification:
                 test_accuracy = F.accuracy(predict, y).data
                 return float(test_accuracy)
+            else:
+                return flota(test_loss)
 
     def predict(self, x):
         if not self.fit__:
