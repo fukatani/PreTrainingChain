@@ -22,6 +22,11 @@ ChainList for the purpose of network scalability/congirablity/Pre-training execu
    Pretraining is executed by using Bengio method.
    (http://arxiv.org/pdf/1206.5538.pdf)
    If length of train_Data is zero, Pre-training is skipped.
+   
+####3)Usage as scikit-learn library, and correpond to GridSearch parameter tuning.
+You can use PreTraining_chain as scikit-learn library, So ChainClassfier.fit, ChainClassfier.predict, ChainClassfier.score is usable.
+Also you can use sklearn.gridsearchCV.
+Please see [GridSearchExample.py.](https://github.com/fukatani/PreTrainingChain/blob/master/PreTrainingChain/GridSearchExample.py)
 
 
 ##Software Requirements
