@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Name:        PretrainingChain
+# Name:        AbstractChain
 # Purpose:
 #
 # Author:      rf
@@ -57,14 +57,14 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
 
         self.total_layer = len(self.n_units)
         ChainList.__init__(self)
-        self.collect_child_model()
-        self.set_optimizer()
+        self.__collect_child_model()
+        self.__set_optimizer()
 
-    def set_optimizer(self):
+    def __set_optimizer(self):
         self.optimizer = optimizers.AdaDelta()
         self.optimizer.setup(self)
 
-    def collect_child_model(self):
+    def __collect_child_model(self):
         self.child_models = []
         for i, n_unit in enumerate(self.n_units):
             if i == 0: continue

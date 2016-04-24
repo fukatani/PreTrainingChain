@@ -12,19 +12,7 @@
 import numpy as np
 from PreTrainingChain import ChainClassfier
 from sklearn import grid_search
-
-def make_sample(size):
-    from sklearn.datasets import fetch_mldata
-    print('fetch MNIST dataset')
-    sample = fetch_mldata('MNIST original')
-    perm = np.random.permutation(len(sample.data))
-    sample.data = sample.data[perm[0: size]]
-    sample.target = sample.target[perm[0: size]]
-    print('Successed data fetching')
-    sample.data   = sample.data.astype(np.float32)
-    sample.data  /= 255
-    sample.target = sample.target.astype(np.int32)
-    return sample
+from util import make_sample
 
 if __name__ == '__main__':
     pre_train_size = 1
