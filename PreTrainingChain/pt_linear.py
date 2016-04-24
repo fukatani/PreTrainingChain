@@ -83,7 +83,7 @@ class PTLinearFunction(function.Function):
             gW = gy.T.dot(x)
             if len(inputs) >= 3:
                 gb = gy.sum(0)
-                return gx, gW, gb, numpy.zeros(x.shape[1]) #gb2=0
+                return gx, gW, gb, numpy.zeros(x.shape[1]).astype(numpy.float32) #gb2=0
             else:
                 return gx, gW
         else:
