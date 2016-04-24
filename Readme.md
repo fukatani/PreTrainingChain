@@ -32,7 +32,7 @@ Please see [GridSearchExample.py.](https://github.com/fukatani/PreTrainingChain/
 ##Software Requirements
 
 * Python (2.7)
-* chainer >= 1.5.0
+* chainer >= 1.8.0
 * scikit-learn
 
 ##Installation
