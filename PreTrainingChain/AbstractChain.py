@@ -31,6 +31,8 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
        F.Linear(200, 160)
        F.Linear(160, 10)
        You can change total layers without any hard coding.
+       (But first layer must be same as input dimension,
+       and last layer must be same as output dimension.)
 
     2) Pre-training is implemented.
        You can use it only by calling AbstractChain.pre_training(train_data, test_data)
@@ -158,8 +160,12 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
                 return flota(test_loss)
 
     def predict(self, x):
+        """
+        [FUNCTIONS]
+        Calc predict data for testdata x.
+        """
         if not self.fit__:
-            raise Exception('Call predict before fit.')
+            raise Exception("Can't predict before fit.")
         return self.forward(x, False)
 
     def visualize_net(self, loss):
@@ -191,6 +197,11 @@ class ChildChainList(ChainList):
         return F.dropout(F.relu(self[0](x_data)), train=train)
 
     def learn_as_autoencoder(self, x_train, x_test=None):
+        """
+        [Functions]
+        Learn as autoencoder for pre learning.
+        Decide for deciding initial weight.
+        """
         optimizer = self.optimizer
         train_size = x_train.shape[0]
         train_data_size = x_train.shape[1]
