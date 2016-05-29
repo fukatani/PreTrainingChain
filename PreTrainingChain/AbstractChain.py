@@ -48,6 +48,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         self.epoch = epoch
         self.batch_size = batch_size
         self.__constructed = False
+        self.pre_trained = False
 
     def __construct(self):
         """
@@ -61,6 +62,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         ChainList.__init__(self)
         self.__collect_child_model()
         self.__set_optimizer()
+        self.__constructed = True
 
     def __set_optimizer(self):
         self.optimizer = optimizers.AdaDelta()
@@ -121,10 +123,11 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
     def fit(self, x_train, y_train, x_pre_train=None, x_pre_test=None):
         if not self.__constructed:
             self.__construct()
-        if x_pre_train is not None:
-            self.pre_training(x_pre_train, x_pre_test)
-        else:
-            self.pre_training(np.array([]), np.array([]))
+        if not self.pre_trained:
+            if x_pre_train is not None:
+                self.pre_training(x_pre_train, x_pre_test)
+            else:
+                self.pre_training(np.array([]), np.array([]))
         train_size = x_train.shape[0]
         train_data_size = x_train.shape[1]
 
