@@ -31,7 +31,7 @@ class ChainClassfier(AbstractChain):
 
     def predict(self, x):
         proba = self.predict_proba(X)
-        return F.Softmax(proba)
+        return np.argmax(proba, axis=1)
 
 class ChainRegression(AbstractChain):
     isClassification = False

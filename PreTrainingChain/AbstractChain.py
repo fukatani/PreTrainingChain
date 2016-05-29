@@ -76,7 +76,10 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         data = x_data
         for i in range(len(self) - 1):
             data = F.dropout(F.relu(self[i](data)), train=train)
-        data = F.dropout(self[-1](data), train=train)
+        if self.isClassification:
+            data = F.dropout(F.softmax(self[-1](data)), train=train)
+        else:
+            data = F.dropout(self[-1](data), train=train)
         return data
 
     def pre_training(self, sample, test=None):
