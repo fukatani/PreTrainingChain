@@ -9,6 +9,7 @@
 # Licence:     Apache Licence 2.0
 #-------------------------------------------------------------------------------
 
+from chainer import Variable
 from AbstractChain import AbstractChain
 import chainer.functions as F
 import numpy as np
@@ -19,8 +20,18 @@ class ChainClassfier(AbstractChain):
     isClassification = True
     def loss_function(self, x, y):
         return F.softmax_cross_entropy(x, y)
+
     def add_last_layer(self):
         self.add_link(F.Linear(self.n_units[-1], self.last_unit))
+
+    def predict_proba(self, x):
+        if not self.fit__:
+            raise Exception('Call predict before fit.')
+        return self.forward(Variable(x), False).data
+
+    def predict(self, x):
+        proba = self.predict_proba(X)
+        return F.Softmax(proba)
 
 class ChainRegression(AbstractChain):
     isClassification = False

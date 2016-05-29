@@ -144,7 +144,10 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
     def score(self, x_test, y_test):
         if len(x_test):
             y = Variable(y_test)
-            predict = self.predict(x_test)
+            if self.isClassification:
+                predict = self.predict_proba(x_test)
+            else:
+                predict = self.predict(x_test)
             test_loss = self.loss_function(Variable(predict), y).data
             print('test_loss: ' + str(test_loss))
             if self.isClassification:
