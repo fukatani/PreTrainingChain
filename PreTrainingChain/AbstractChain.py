@@ -74,15 +74,10 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
 
     def forward(self, x_data, train=True):
         data = x_data
-        if self.isClassification:
-            for model in self:
-                data = F.dropout(F.relu(model(data)), train=train)
-            return data
-        else:
-            for model in range(len(self) - 1):
-                data = F.dropout(F.relu(model(data)), train=train)
-            data = F.dropout(model(data), train=train)
-            return data
+        for i in range(len(self) - 1):
+            data = F.dropout(F.relu(self[i](data)), train=train)
+        data = F.dropout(self[-1](data), train=train)
+        return data
 
     def pre_training(self, sample, test=None):
         """
