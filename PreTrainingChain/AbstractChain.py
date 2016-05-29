@@ -54,8 +54,8 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         Instead of __init.
         For correspond to gridsearchCV.
         """
-        self.n_units = self.n_units[0:-1]
         self.last_unit = self.n_units[-1]
+        self.n_units = self.n_units[0:-1]
 
         self.total_layer = len(self.n_units)
         ChainList.__init__(self)
@@ -148,25 +148,20 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
 
     def score(self, x_test, y_test):
         if len(x_test):
-            x = Variable(x_test)
             y = Variable(y_test)
-            predict = self.predict(x)
-            test_loss = self.loss_function(predict, y).data
+            predict = self.predict(x_test)
+            test_loss = self.loss_function(Variable(predict), y).data
             print('test_loss: ' + str(test_loss))
             if self.isClassification:
-                test_accuracy = F.accuracy(predict, y).data
+                test_accuracy = F.accuracy(Variable(predict), y).data
                 return float(test_accuracy)
             else:
                 return flota(test_loss)
 
     def predict(self, x):
-        """
-        [FUNCTIONS]
-        Calc predict data for testdata x.
-        """
         if not self.fit__:
-            raise Exception("Can't predict before fit.")
-        return self.forward(x, False)
+            raise Exception('Call predict before fit.')
+        return self.forward(Variable(x), False).data
 
     def visualize_net(self, loss):
         import chainer.computational_graph as c
@@ -197,11 +192,6 @@ class ChildChainList(ChainList):
         return F.dropout(F.relu(self[0](x_data)), train=train)
 
     def learn_as_autoencoder(self, x_train, x_test=None):
-        """
-        [Functions]
-        Learn as autoencoder for pre learning.
-        Decide for deciding initial weight.
-        """
         optimizer = self.optimizer
         train_size = x_train.shape[0]
         train_data_size = x_train.shape[1]
