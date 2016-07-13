@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 import re
 import os
 
-version = '0.1.8'
+version = '0.1.9'
 
 def read(filename):
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
