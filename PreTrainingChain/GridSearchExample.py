@@ -37,7 +37,7 @@ if __name__ == '__main__':
     pc = ChainClassfier([784,400,150,10])
     #gridsearch for hidden layers and learning epoch.
     result = grid_search.GridSearchCV(pc, {'n_units': ([784,400,150,10], [784,300,150,10]),
-                                           'epoch': (10,12,14)}, verbose=3, n_jobs=-1)
+                                           'epoch': (10, 14)}, verbose=3, n_jobs=1, cv=2)
     result.fit(x_train, y_train)
     print(result.best_params_)
 
