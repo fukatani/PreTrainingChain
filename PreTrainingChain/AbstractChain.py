@@ -43,12 +43,18 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
     3) This class is super class of ChainList.
        So you can use function of ChainList.
     """
-    def __init__(self, n_units, epoch=10, batch_size=100):
+    def __init__(self, n_units, epoch=10, batch_size=100,
+                 dropout_rate=(), optimizer=optimizers.AdaDelta()):
         self.n_units = n_units
         self.epoch = epoch
         self.batch_size = batch_size
         self.__constructed = False
         self.pre_trained = False
+        self.optimizer = optimizer
+        if dropout_rate:
+            self.dropout_rate = dropout_rate
+        else:
+            self.dropout_rate = [.5 for i in n_units]
 
     def __construct(self):
         """
@@ -61,12 +67,8 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
         self.total_layer = len(self.n_units)
         ChainList.__init__(self)
         self.__collect_child_model()
-        self.__set_optimizer()
-        self.__constructed = True
-
-    def __set_optimizer(self):
-        self.optimizer = optimizers.AdaDelta()
         self.optimizer.setup(self)
+        self.__constructed = True
 
     def __collect_child_model(self):
         self.child_models = []
@@ -77,9 +79,13 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
     def forward(self, x_data, train=True):
         data = x_data
         for i in range(len(self) - 1):
-            data = F.dropout(F.relu(self[i](data)), train=train)
+            data = F.dropout(F.relu(self[i](data)),
+                             self.dropout_rate[i],
+                             train=train)
         if self.isClassification:
-            data = F.dropout(F.softmax(self[-1](data)), train=train)
+            data = F.dropout(F.softmax(self[-1](data)),
+                             self.dropout_rate[-1],
+                             train=train)
         else:
             data = F.dropout(self[-1](data), train=train)
         return data
