@@ -183,7 +183,7 @@ class AbstractChain(ChainList, BaseEstimator, ClassifierMixin):
 class ChildChainList(ChainList):
     """
     [Classes]
-    This class mustn't be called directoly.
+    This class mustn't be called directly.
     Have to be called by super class of AbstractChain.
     This chain will be learn as autoencoder,
     so I don't expect to configurate forward, forward_as_autoencoder and learn_as_autoencoder.
