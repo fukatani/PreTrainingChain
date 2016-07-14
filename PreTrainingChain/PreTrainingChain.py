@@ -33,6 +33,7 @@ class ChainClassfier(AbstractChain):
         proba = self.predict_proba(X)
         return np.argmax(proba, axis=1)
 
+
 class ChainRegression(AbstractChain):
     isClassification = False
     def loss_function(self, x, y):
@@ -40,4 +41,3 @@ class ChainRegression(AbstractChain):
 
     def add_last_layer(self):
         self.add_link(F.Linear(self.n_units[-1], self.last_unit))
-
