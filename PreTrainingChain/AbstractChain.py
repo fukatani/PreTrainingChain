@@ -9,7 +9,7 @@
 # Licence:     Apache Licence 2.0
 #-------------------------------------------------------------------------------
 
-from chainer import cuda, Variable, ChainList, optimizers
+from chainer import Variable, ChainList, optimizers
 from sklearn.base import BaseEstimator, ClassifierMixin
 import chainer.functions as F
 import numpy as np
